@@ -34,6 +34,8 @@ export const DropsTraining = ({
     incorrect: 0,
     wordsLearned: 0
   });
+  const [showDropAnimation, setShowDropAnimation] = useState(false);
+  const [animationStep, setAnimationStep] = useState(0);
 
   const learnedWords = words.filter(w => w.isLearned);
   const unlearnedWords = words.filter(w => !w.isLearned);
@@ -56,6 +58,7 @@ export const DropsTraining = ({
       const randomUnlearned = unlearnedWords[Math.floor(Math.random() * unlearnedWords.length)];
       setCurrentWord(randomUnlearned);
       setTrainingState('memorizing');
+      startDropAnimation();
       return;
     }
 
@@ -108,26 +111,20 @@ export const DropsTraining = ({
     const shuffledWords = availableWords.sort(() => Math.random() - 0.5);
     const otherWords = shuffledWords.slice(0, 3);
 
-    console.log('Training mode:', mode);
-    console.log('Current word:', correctWord);
-
     if (mode === 'translation') {
       // Show English word, choose Russian translation
       const allOptions = [correctWord.russian, ...otherWords.map(w => w.russian)];
       const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
-      console.log('Translation options (Russian):', shuffledOptions);
       setOptions(shuffledOptions);
     } else {
       // Pronunciation mode: show audio, choose English word  
       const allOptions = [correctWord.english, ...otherWords.map(w => w.english)];
       const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
-      console.log('Pronunciation options (English):', shuffledOptions);
       setOptions(shuffledOptions);
     }
   };
 
   const handleStartTraining = (mode: TrainingMode) => {
-    console.log('Starting training with mode:', mode);
     setTrainingMode(mode);
     setSessionStats({ correct: 0, incorrect: 0, wordsLearned: 0 });
     getNextWord(mode);
@@ -174,6 +171,21 @@ export const DropsTraining = ({
     if (currentWord) {
       speakWord(currentWord.english);
     }
+  };
+
+  const startDropAnimation = () => {
+    setShowDropAnimation(true);
+    setAnimationStep(0);
+    
+    // Animation sequence
+    setTimeout(() => setAnimationStep(1), 200);  // Drop appears
+    setTimeout(() => setAnimationStep(2), 800);  // Drop falls
+    setTimeout(() => setAnimationStep(3), 1400); // Drop hits bottom
+    setTimeout(() => setAnimationStep(4), 2000); // Circle expands
+    setTimeout(() => {
+      setAnimationStep(5); // Word appears
+      setShowDropAnimation(false);
+    }, 3000);
   };
 
   // Mode selection screen
@@ -297,36 +309,72 @@ export const DropsTraining = ({
 
         {/* Memorization screen */}
         {trainingState === 'memorizing' && currentWord && (
-          <Card className="mb-6">
-            <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl">🧠 Запомни новое слово</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <div className="mb-8">
-                <p className="text-5xl font-bold text-blue-600 mb-4">
-                  {currentWord.english}
-                </p>
-                <p className="text-2xl text-gray-700 mb-4">
-                  {currentWord.russian}
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={handlePlayAudio}
-                  className="mb-4"
-                >
-                  <Icon name="Volume2" size={20} className="mr-2" />
-                  Произношение
-                </Button>
-              </div>
+          <Card className="mb-6 relative overflow-hidden">
+            <CardContent className="text-center p-12 min-h-[400px] flex flex-col justify-center">
+              {showDropAnimation ? (
+                <div className="relative h-64 flex items-center justify-center">
+                  {/* Drop Animation Container */}
+                  <div className="absolute inset-0 flex flex-col items-center">
+                    {/* Drop */}
+                    {animationStep >= 1 && (
+                      <div 
+                        className={`bg-blue-500 transition-all duration-500 ${
+                          animationStep === 1 ? 'w-6 h-8 rounded-full opacity-0 -translate-y-32' :
+                          animationStep === 2 ? 'w-6 h-8 rounded-full opacity-100 translate-y-0' :
+                          animationStep === 3 ? 'w-8 h-6 rounded-full opacity-100 translate-y-24' :
+                          animationStep >= 4 ? 'w-16 h-16 rounded-full opacity-100 translate-y-24 scale-150' : ''
+                        }`}
+                        style={{
+                          borderRadius: animationStep <= 2 ? '50% 50% 50% 50% / 60% 60% 40% 40%' : '50%',
+                          transform: `translateY(${
+                            animationStep === 1 ? '-8rem' :
+                            animationStep === 2 ? '0rem' :
+                            animationStep === 3 ? '6rem' :
+                            animationStep >= 4 ? '6rem' : '0'
+                          }) ${animationStep >= 4 ? 'scale(1.5)' : ''}`
+                        }}
+                      />
+                    )}
+                    
+                    {/* Ripple Effect */}
+                    {animationStep >= 4 && (
+                      <div className="absolute bottom-8 w-32 h-32 border-4 border-blue-300 rounded-full animate-ping opacity-50" />
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  <div className="mb-8">
+                    <div className="text-6xl mb-4">💧</div>
+                    <h3 className="text-2xl font-bold mb-6 text-blue-600">Запомни новое слово</h3>
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-6">
+                      <p className="text-5xl font-bold text-blue-600 mb-4">
+                        {currentWord.english}
+                      </p>
+                      <p className="text-2xl text-gray-700 mb-4">
+                        {currentWord.russian}
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={handlePlayAudio}
+                        className="mb-4"
+                      >
+                        <Icon name="Volume2" size={20} className="mr-2" />
+                        Произношение
+                      </Button>
+                    </div>
+                  </div>
 
-              <Button
-                onClick={handleMemorized}
-                size="lg"
-                className="bg-green-500 hover:bg-green-600 text-white px-8 py-4"
-              >
-                <Icon name="Brain" size={24} className="mr-3" />
-                Запомнил!
-              </Button>
+                  <Button
+                    onClick={handleMemorized}
+                    size="lg"
+                    className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-xl"
+                  >
+                    <Icon name="Brain" size={24} className="mr-3" />
+                    Я запомнил!
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -376,9 +424,7 @@ export const DropsTraining = ({
                   </Button>
                 ))}
               </div>
-              <div className="mt-4 text-xs text-gray-400">
-                Debug: Mode={trainingMode}, Options={JSON.stringify(options)}
-              </div>
+
             </CardContent>
           </Card>
         )}
