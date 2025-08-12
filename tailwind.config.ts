@@ -24,6 +24,15 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				game: {
+					primary: '#FF6B6B',
+					secondary: '#4ECDC4',
+					accent: '#45B7D1',
+					success: '#96CEB4',
+					warning: '#FFEAA7',
+					error: '#FF7675',
+					neutral: '#F8F9FA'
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'

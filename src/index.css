@@ -49,6 +49,14 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --game-primary: 6 78% 57%;
+    --game-secondary: 171 82% 59%;
+    --game-accent: 200 98% 60%;
+    --game-success: 140 31% 68%;
+    --game-warning: 45 93% 78%;
+    --game-error: 3 100% 73%;
+    --game-neutral: 210 11% 96%;
   }
 
   .dark {
