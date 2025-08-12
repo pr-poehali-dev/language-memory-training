@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useVocabulary } from '@/hooks/useVocabulary';
 import { MainMenu } from './MainMenu';
 import { VocabularyManager } from './VocabularyManager';
-import { GameTraining } from './GameTraining';
+import { DropsTraining } from './DropsTraining';
 import { UserProfile } from './UserProfile';
 import { Statistics } from './Statistics';
 import Icon from '@/components/ui/icon';
@@ -18,7 +18,7 @@ export const VocabularyApp = () => {
       case 'vocabulary':
         return <VocabularyManager {...vocabularyHook} onBack={() => setCurrentScreen('menu')} />;
       case 'training':
-        return <GameTraining {...vocabularyHook} onBack={() => setCurrentScreen('menu')} />;
+        return <DropsTraining {...vocabularyHook} onBack={() => setCurrentScreen('menu')} />;
       case 'profile':
         return <UserProfile {...vocabularyHook} onBack={() => setCurrentScreen('menu')} />;
       case 'stats':

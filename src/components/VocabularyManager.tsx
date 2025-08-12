@@ -148,6 +148,7 @@ export const VocabularyManager = ({
                   ) : (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4 flex-1">
+                        <div className={`w-4 h-4 rounded-full ${word.isLearned ? 'bg-green-500' : 'bg-red-500'}`}></div>
                         <div className="flex-1">
                           <span className="font-semibold text-lg">{word.english}</span>
                           <span className="mx-3 text-gray-400">→</span>
