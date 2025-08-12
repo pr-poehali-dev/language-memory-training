@@ -90,7 +90,7 @@ export const DropsTraining = ({
 
   const generateTestOptions = (correctWord: Word) => {
     // Get only learned words for options (excluding current word)
-    const availableWords = learnedWords.filter(w => w.id !== correctWord.id);
+    let availableWords = learnedWords.filter(w => w.id !== correctWord.id);
     
     if (availableWords.length < 3) {
       // Not enough learned words, fallback to any words
@@ -99,25 +99,33 @@ export const DropsTraining = ({
         onBack();
         return;
       }
-      availableWords.push(...fallbackWords.slice(0, 3 - availableWords.length));
+      availableWords = [...availableWords, ...fallbackWords.slice(0, 3 - availableWords.length)];
     }
 
     // Shuffle and take 3 random words
     const shuffledWords = availableWords.sort(() => Math.random() - 0.5);
     const otherWords = shuffledWords.slice(0, 3);
 
+    console.log('Training mode:', trainingMode);
+    console.log('Current word:', correctWord);
+
     if (trainingMode === 'translation') {
       // Show English word, choose Russian translation
       const allOptions = [correctWord.russian, ...otherWords.map(w => w.russian)];
-      setOptions(allOptions.sort(() => Math.random() - 0.5));
+      const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+      console.log('Translation options (Russian):', shuffledOptions);
+      setOptions(shuffledOptions);
     } else {
-      // Pronunciation mode: show audio, choose English word
+      // Pronunciation mode: show audio, choose English word  
       const allOptions = [correctWord.english, ...otherWords.map(w => w.english)];
-      setOptions(allOptions.sort(() => Math.random() - 0.5));
+      const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+      console.log('Pronunciation options (English):', shuffledOptions);
+      setOptions(shuffledOptions);
     }
   };
 
   const handleStartTraining = (mode: TrainingMode) => {
+    console.log('Starting training with mode:', mode);
     setTrainingMode(mode);
     setSessionStats({ correct: 0, incorrect: 0, wordsLearned: 0 });
     getNextWord();
@@ -360,10 +368,14 @@ export const DropsTraining = ({
                     size="lg"
                     onClick={() => handleAnswerSelect(option)}
                     className="p-4 text-lg hover:bg-blue-50"
+                    title={`Mode: ${trainingMode}, Option: ${option}`}
                   >
                     {option}
                   </Button>
                 ))}
+              </div>
+              <div className="mt-4 text-xs text-gray-400">
+                Debug: Mode={trainingMode}, Options={JSON.stringify(options)}
               </div>
             </CardContent>
           </Card>
