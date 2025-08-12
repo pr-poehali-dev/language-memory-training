@@ -48,7 +48,9 @@ export const DropsTraining = ({
     }
   };
 
-  const getNextWord = () => {
+  const getNextWord = (mode?: TrainingMode) => {
+    const currentMode = mode || trainingMode;
+    
     // First priority: unlearned words for memorization
     if (unlearnedWords.length > 0) {
       const randomUnlearned = unlearnedWords[Math.floor(Math.random() * unlearnedWords.length)];
@@ -77,7 +79,7 @@ export const DropsTraining = ({
         random -= item.weight;
         if (random <= 0) {
           setCurrentWord(item.word);
-          generateTestOptions(item.word);
+          generateTestOptions(item.word, currentMode);
           setTrainingState('testing');
           return;
         }
@@ -88,7 +90,7 @@ export const DropsTraining = ({
     onBack();
   };
 
-  const generateTestOptions = (correctWord: Word) => {
+  const generateTestOptions = (correctWord: Word, mode: TrainingMode) => {
     // Get only learned words for options (excluding current word)
     let availableWords = learnedWords.filter(w => w.id !== correctWord.id);
     
@@ -106,10 +108,10 @@ export const DropsTraining = ({
     const shuffledWords = availableWords.sort(() => Math.random() - 0.5);
     const otherWords = shuffledWords.slice(0, 3);
 
-    console.log('Training mode:', trainingMode);
+    console.log('Training mode:', mode);
     console.log('Current word:', correctWord);
 
-    if (trainingMode === 'translation') {
+    if (mode === 'translation') {
       // Show English word, choose Russian translation
       const allOptions = [correctWord.russian, ...otherWords.map(w => w.russian)];
       const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
@@ -128,7 +130,7 @@ export const DropsTraining = ({
     console.log('Starting training with mode:', mode);
     setTrainingMode(mode);
     setSessionStats({ correct: 0, incorrect: 0, wordsLearned: 0 });
-    getNextWord();
+    getNextWord(mode);
   };
 
   const handleMemorized = () => {
