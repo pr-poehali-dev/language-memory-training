@@ -89,14 +89,29 @@ export const DropsTraining = ({
   };
 
   const generateTestOptions = (correctWord: Word) => {
+    // Get only learned words for options (excluding current word)
+    const availableWords = learnedWords.filter(w => w.id !== correctWord.id);
+    
+    if (availableWords.length < 3) {
+      // Not enough learned words, fallback to any words
+      const fallbackWords = words.filter(w => w.id !== correctWord.id);
+      if (fallbackWords.length < 3) {
+        onBack();
+        return;
+      }
+      availableWords.push(...fallbackWords.slice(0, 3 - availableWords.length));
+    }
+
+    // Shuffle and take 3 random words
+    const shuffledWords = availableWords.sort(() => Math.random() - 0.5);
+    const otherWords = shuffledWords.slice(0, 3);
+
     if (trainingMode === 'translation') {
       // Show English word, choose Russian translation
-      const otherWords = getRandomWords([correctWord.id], 3);
       const allOptions = [correctWord.russian, ...otherWords.map(w => w.russian)];
       setOptions(allOptions.sort(() => Math.random() - 0.5));
     } else {
       // Pronunciation mode: show audio, choose English word
-      const otherWords = getRandomWords([correctWord.id], 3);
       const allOptions = [correctWord.english, ...otherWords.map(w => w.english)];
       setOptions(allOptions.sort(() => Math.random() - 0.5));
     }
