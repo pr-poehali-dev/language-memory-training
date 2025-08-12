@@ -14,9 +14,7 @@ export const MainMenu = ({ onNavigate, wordsCount }: MainMenuProps) => {
     <div className="p-8 text-center">
       <div className="mb-8">
         <div className="text-6xl mb-4">🚀</div>
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">
-          Изучение английского
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">Капли</h1>
         <p className="text-gray-600">
           Твой персональный тренажер для запоминания слов
         </p>
