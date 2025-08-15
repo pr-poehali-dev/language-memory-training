@@ -31,3 +31,4 @@ export interface UserStats {
 
 export type GameMode = 'learn' | 'practice';
 export type GameState = 'idle' | 'learning' | 'practicing' | 'completed';
+export type TrainingMode = 'translation' | 'pronunciation' | 'russian';

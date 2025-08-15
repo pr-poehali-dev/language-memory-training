@@ -25,6 +25,7 @@ export const VocabularyManager = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editEnglish, setEditEnglish] = useState('');
   const [editRussian, setEditRussian] = useState('');
+  const [showExcelImport, setShowExcelImport] = useState(false);
 
   const handleAddWord = () => {
     if (newEnglish.trim() && newRussian.trim()) {
@@ -55,6 +56,41 @@ export const VocabularyManager = ({
     setEditRussian('');
   };
 
+  const handleExcelImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      
+      // Parse CSV/Excel content
+      const lines = content.split('\n').filter(line => line.trim());
+      let importedCount = 0;
+      
+      lines.forEach((line, index) => {
+        // Skip header row if exists
+        if (index === 0 && (line.toLowerCase().includes('термин') || line.toLowerCase().includes('term') || line.toLowerCase().includes('english'))) {
+          return;
+        }
+        
+        const columns = line.split(/[,;\t]/).map(col => col.trim().replace(/"/g, ''));
+        
+        if (columns.length >= 2 && columns[0] && columns[1]) {
+          // First column - term (English), Second column - definition (Russian)
+          addWord(columns[0], columns[1]);
+          importedCount++;
+        }
+      });
+      
+      alert(`Импортировано ${importedCount} слов из файла!`);
+      setShowExcelImport(false);
+    };
+    
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  };
+
   return (
     <div className="p-6">
       <div className="mb-8">
@@ -66,12 +102,40 @@ export const VocabularyManager = ({
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Icon name="Plus" size={24} className="mr-2" />
-            Добавить новое слово
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Icon name="Plus" size={24} className="mr-2" />
+              Добавить новое слово
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setShowExcelImport(!showExcelImport)}
+              className="text-blue-600 border-blue-600 hover:bg-blue-50"
+            >
+              <Icon name="FileSpreadsheet" size={16} className="mr-2" />
+              Импорт Excel
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {showExcelImport && (
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border-2 border-dashed border-blue-300">
+              <h4 className="font-semibold text-blue-800 mb-2">📊 Загрузка из Excel/CSV</h4>
+              <p className="text-sm text-blue-600 mb-4">
+                Формат файла: первый столбец - термин (английский), второй столбец - определение (русский)
+              </p>
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls,.txt"
+                onChange={handleExcelImport}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Поддерживаются форматы: CSV, Excel (.xlsx, .xls), TXT
+              </p>
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
               placeholder="Английское слово"

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
-import { Word } from '@/types/vocabulary';
+import { Word, TrainingMode } from '@/types/vocabulary';
 
 interface DropsTrainingProps {
   words: Word[];
@@ -12,7 +12,7 @@ interface DropsTrainingProps {
   onBack: () => void;
 }
 
-type TrainingMode = 'translation' | 'pronunciation';
+
 type TrainingState = 'mode-select' | 'memorizing' | 'testing' | 'result';
 
 export const DropsTraining = ({
@@ -116,9 +116,14 @@ export const DropsTraining = ({
       const allOptions = [correctWord.russian, ...otherWords.map(w => w.russian)];
       const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
       setOptions(shuffledOptions);
-    } else {
+    } else if (mode === 'pronunciation') {
       // Pronunciation mode: show audio, choose English word  
       const allOptions = [correctWord.english, ...otherWords.map(w => w.english)];
+      const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+      setOptions(shuffledOptions);
+    } else if (mode === 'russian') {
+      // Russian mode: show Russian pronunciation, choose Russian word
+      const allOptions = [correctWord.russian, ...otherWords.map(w => w.russian)];
       const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
       setOptions(shuffledOptions);
     }
@@ -209,7 +214,7 @@ export const DropsTraining = ({
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card 
               className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-blue-500"
               onClick={() => words.length >= 4 && handleStartTraining('translation')}
@@ -258,6 +263,36 @@ export const DropsTraining = ({
                 </div>
               </CardContent>
             </Card>
+
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-green-500"
+              onClick={() => words.length >= 4 && handleStartTraining('russian')}
+            >
+              <CardHeader className="text-center pb-4">
+                <div className="text-4xl mb-3">🇷🇺</div>
+                <CardTitle className="text-xl">Русские слова</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 mb-4">
+                  Слушаешь русское произношение → выбираешь правильное русское слово
+                </p>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mb-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      speakWord('Яблоко');
+                    }}
+                  >
+                    <Icon name="Volume2" size={16} className="mr-2" />
+                    Послушать
+                  </Button>
+                  <p className="text-sm text-gray-500">→ Яблоко</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
@@ -283,11 +318,11 @@ export const DropsTraining = ({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className="text-2xl">
-              {trainingMode === 'translation' ? '📖' : '🔊'}
+              {trainingMode === 'translation' ? '📖' : trainingMode === 'pronunciation' ? '🔊' : '🇷🇺'}
             </div>
             <div>
               <h3 className="text-lg font-semibold">
-                {trainingMode === 'translation' ? 'Перевод' : 'Произношение'}
+                {trainingMode === 'translation' ? 'Перевод' : trainingMode === 'pronunciation' ? 'Произношение' : 'Русские слова'}
               </h3>
               <div className="flex space-x-4 text-sm text-gray-600">
                 <span>✅ {sessionStats.correct}</span>
@@ -309,66 +344,65 @@ export const DropsTraining = ({
 
         {/* Memorization screen */}
         {trainingState === 'memorizing' && currentWord && (
-          <Card className="mb-6 relative overflow-hidden">
-            <CardContent className="text-center p-12 min-h-[400px] flex flex-col justify-center">
+          <Card className="mb-6 relative overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
+            <CardContent className="text-center p-12 min-h-[500px] flex flex-col justify-center relative">
               {showDropAnimation ? (
-                <div className="relative h-64 flex items-center justify-center">
-                  {/* Drop Animation Container */}
-                  <div className="absolute inset-0 flex flex-col items-center">
-                    {/* Drop */}
-                    {animationStep >= 1 && (
-                      <div 
-                        className={`bg-blue-500 transition-all duration-500 ${
-                          animationStep === 1 ? 'w-6 h-8 rounded-full opacity-0 -translate-y-32' :
-                          animationStep === 2 ? 'w-6 h-8 rounded-full opacity-100 translate-y-0' :
-                          animationStep === 3 ? 'w-8 h-6 rounded-full opacity-100 translate-y-24' :
-                          animationStep >= 4 ? 'w-16 h-16 rounded-full opacity-100 translate-y-24 scale-150' : ''
-                        }`}
-                        style={{
-                          borderRadius: animationStep <= 2 ? '50% 50% 50% 50% / 60% 60% 40% 40%' : '50%',
-                          transform: `translateY(${
-                            animationStep === 1 ? '-8rem' :
-                            animationStep === 2 ? '0rem' :
-                            animationStep === 3 ? '6rem' :
-                            animationStep >= 4 ? '6rem' : '0'
-                          }) ${animationStep >= 4 ? 'scale(1.5)' : ''}`
-                        }}
-                      />
-                    )}
-                    
-                    {/* Ripple Effect */}
-                    {animationStep >= 4 && (
-                      <div className="absolute bottom-8 w-32 h-32 border-4 border-blue-300 rounded-full animate-ping opacity-50" />
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  <div className="mb-8">
-                    <div className="text-6xl mb-4">💧</div>
-                    <h3 className="text-2xl font-bold mb-6 text-blue-600">Запомни новое слово</h3>
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-6">
-                      <p className="text-5xl font-bold text-blue-600 mb-4">
+                <div className="relative h-96 flex items-center justify-center">
+                  {/* Smooth Drop Animation */}
+                  <div 
+                    className="absolute w-24 h-32 bg-gradient-to-b from-blue-400 to-blue-600 shadow-lg"
+                    style={{
+                      borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                      animation: 'dropFall 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
+                    }}
+                  />
+                  
+                  {/* Final Large Circle with Content */}
+                  <div 
+                    className="absolute w-80 h-80 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex flex-col items-center justify-center text-white shadow-2xl opacity-0"
+                    style={{
+                      animation: 'circleAppear 0.5s ease-out 2.5s forwards'
+                    }}
+                  >
+                    <div className="text-center space-y-4">
+                      <p className="text-4xl font-bold mb-3">
                         {currentWord.english}
                       </p>
-                      <p className="text-2xl text-gray-700 mb-4">
+                      <p className="text-2xl mb-4 text-blue-100">
                         {currentWord.russian}
                       </p>
                       <Button
                         variant="outline"
                         onClick={handlePlayAudio}
-                        className="mb-4"
+                        className="bg-white/20 border-white/30 text-white hover:bg-white/30 mb-4"
+                        size="sm"
                       >
-                        <Icon name="Volume2" size={20} className="mr-2" />
-                        Произношение
+                        <Icon name="Volume2" size={16} className="mr-2" />
+                        🔊
                       </Button>
                     </div>
                   </div>
-
+                  
+                  {/* Thick Ripple Waves */}
+                  <div 
+                    className="absolute w-96 h-96 border-8 border-blue-400 rounded-full opacity-0"
+                    style={{
+                      animation: 'ripple1 1s ease-out 2s forwards'
+                    }}
+                  />
+                  <div 
+                    className="absolute w-[28rem] h-[28rem] border-6 border-purple-400 rounded-full opacity-0"
+                    style={{
+                      animation: 'ripple2 1s ease-out 2.2s forwards'
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-8">
                   <Button
                     onClick={handleMemorized}
                     size="lg"
-                    className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-xl"
+                    className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-xl shadow-lg"
                   >
                     <Icon name="Brain" size={24} className="mr-3" />
                     Я запомнил!
@@ -378,13 +412,78 @@ export const DropsTraining = ({
             </CardContent>
           </Card>
         )}
+        
+        {/* CSS Animation Styles */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes dropFall {
+              0% {
+                transform: translateY(-200px) scale(1);
+                opacity: 1;
+                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+              }
+              60% {
+                transform: translateY(100px) scale(1);
+                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+              }
+              75% {
+                transform: translateY(100px) scaleY(0.6) scaleX(1.4);
+                border-radius: 50%;
+              }
+              85% {
+                transform: translateY(100px) scaleY(0.8) scaleX(1.2);
+                border-radius: 50%;
+              }
+              100% {
+                transform: translateY(100px) scale(3.3);
+                border-radius: 50%;
+                opacity: 0;
+              }
+            }
+            
+            @keyframes circleAppear {
+              0% {
+                opacity: 0;
+                transform: scale(0.5);
+              }
+              100% {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
+            
+            @keyframes ripple1 {
+              0% {
+                opacity: 0.8;
+                transform: scale(0.7);
+              }
+              100% {
+                opacity: 0;
+                transform: scale(1.2);
+              }
+            }
+            
+            @keyframes ripple2 {
+              0% {
+                opacity: 0.6;
+                transform: scale(0.8);
+              }
+              100% {
+                opacity: 0;
+                transform: scale(1.3);
+              }
+            }
+          `
+        }} />
 
         {/* Testing screen */}
         {trainingState === 'testing' && currentWord && (
           <Card className="mb-6">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-2xl">
-                {trainingMode === 'translation' ? '📖 Выбери перевод' : '🔊 Выбери правильное слово'}
+                {trainingMode === 'translation' ? '📖 Выбери перевод' : 
+                 trainingMode === 'pronunciation' ? '🔊 Выбери правильное слово' : 
+                 '🇷🇺 Выбери правильное русское слово'}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
@@ -393,7 +492,7 @@ export const DropsTraining = ({
                   <p className="text-5xl font-bold text-blue-600 mb-8">
                     {currentWord.english}
                   </p>
-                ) : (
+                ) : trainingMode === 'pronunciation' ? (
                   <div className="mb-8">
                     <Button
                       onClick={handlePlayAudio}
@@ -405,6 +504,20 @@ export const DropsTraining = ({
                     </Button>
                     <p className="text-sm text-gray-500 mt-2">
                       Выбери правильное английское слово
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mb-8">
+                    <Button
+                      onClick={() => speakWord(currentWord.russian)}
+                      size="lg"
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      <Icon name="Volume2" size={32} className="mr-3" />
+                      Слушай русское слово
+                    </Button>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Выбери правильное русское слово
                     </p>
                   </div>
                 )}

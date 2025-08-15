@@ -46,35 +46,208 @@ export const UserProfile = ({ words, userStats, saveStats }: UserProfileProps) =
     }
   };
 
+  const getAllAchievements = () => {
+    return [
+      // Learning Milestones
+      { 
+        icon: '🌟', 
+        title: 'Первое слово', 
+        description: 'Выучил первое слово',
+        isUnlocked: learnedWords.length >= 1,
+        category: 'Изучение'
+      },
+      { 
+        icon: '📚', 
+        title: 'Книголюб', 
+        description: 'Выучил 5 слов',
+        isUnlocked: learnedWords.length >= 5,
+        category: 'Изучение'
+      },
+      { 
+        icon: '🏆', 
+        title: 'Десятка', 
+        description: 'Выучил 10 слов',
+        isUnlocked: learnedWords.length >= 10,
+        category: 'Изучение'
+      },
+      { 
+        icon: '🎖️', 
+        title: 'Четверть сотни', 
+        description: 'Выучил 25 слов',
+        isUnlocked: learnedWords.length >= 25,
+        category: 'Изучение'
+      },
+      { 
+        icon: '🎯', 
+        title: 'Полсотни', 
+        description: 'Выучил 50 слов',
+        isUnlocked: learnedWords.length >= 50,
+        category: 'Изучение'
+      },
+      { 
+        icon: '🏅', 
+        title: 'Три четверти', 
+        description: 'Выучил 75 слов',
+        isUnlocked: learnedWords.length >= 75,
+        category: 'Изучение'
+      },
+      { 
+        icon: '🥇', 
+        title: 'Сотня', 
+        description: 'Выучил 100 слов',
+        isUnlocked: learnedWords.length >= 100,
+        category: 'Изучение'
+      },
+      { 
+        icon: '💎', 
+        title: 'Двести', 
+        description: 'Выучил 200 слов',
+        isUnlocked: learnedWords.length >= 200,
+        category: 'Изучение'
+      },
+      { 
+        icon: '👑', 
+        title: 'Полтысячи', 
+        description: 'Выучил 500 слов',
+        isUnlocked: learnedWords.length >= 500,
+        category: 'Изучение'
+      },
+      { 
+        icon: '🌟', 
+        title: 'Тысяча', 
+        description: 'Выучил 1000 слов',
+        isUnlocked: learnedWords.length >= 1000,
+        category: 'Изучение'
+      },
+
+      // Accuracy Achievements
+      { 
+        icon: '🎯', 
+        title: 'Новичок', 
+        description: 'Точность 50%+ (20+ ответов)',
+        isUnlocked: accuracy >= 50 && totalAttempts >= 20,
+        category: 'Точность'
+      },
+      { 
+        icon: '🏹', 
+        title: 'Снайпер', 
+        description: 'Точность 80%+ (50+ ответов)',
+        isUnlocked: accuracy >= 80 && totalAttempts >= 50,
+        category: 'Точность'
+      },
+      { 
+        icon: '🎪', 
+        title: 'Мастер', 
+        description: 'Точность 90%+ (100+ ответов)',
+        isUnlocked: accuracy >= 90 && totalAttempts >= 100,
+        category: 'Точность'
+      },
+      { 
+        icon: '🚀', 
+        title: 'Гений', 
+        description: 'Точность 95%+ (200+ ответов)',
+        isUnlocked: accuracy >= 95 && totalAttempts >= 200,
+        category: 'Точность'
+      },
+
+      // Streak Achievements
+      { 
+        icon: '🔥', 
+        title: 'Три дня', 
+        description: '3 дня изучения подряд',
+        isUnlocked: userStats.streakDays >= 3,
+        category: 'Серии'
+      },
+      { 
+        icon: '💪', 
+        title: 'Неделя подряд', 
+        description: '7 дней изучения подряд',
+        isUnlocked: userStats.streakDays >= 7,
+        category: 'Серии'
+      },
+      { 
+        icon: '⚡', 
+        title: 'Две недели', 
+        description: '14 дней изучения подряд',
+        isUnlocked: userStats.streakDays >= 14,
+        category: 'Серии'
+      },
+      { 
+        icon: '🏋️', 
+        title: 'Месяц подряд', 
+        description: '30 дней изучения подряд',
+        isUnlocked: userStats.streakDays >= 30,
+        category: 'Серии'
+      },
+      { 
+        icon: '🥋', 
+        title: 'Два месяца', 
+        description: '60 дней изучения подряд',
+        isUnlocked: userStats.streakDays >= 60,
+        category: 'Серии'
+      },
+      { 
+        icon: '🦾', 
+        title: 'Сто дней', 
+        description: '100 дней изучения подряд',
+        isUnlocked: userStats.streakDays >= 100,
+        category: 'Серии'
+      },
+
+      // Special Achievements
+      { 
+        icon: '🏃', 
+        title: 'Спринтер', 
+        description: 'Ответил правильно на 10 вопросов подряд',
+        isUnlocked: false, // TODO: implement streak tracking
+        category: 'Особые'
+      },
+      { 
+        icon: '🧠', 
+        title: 'Полиглот', 
+        description: 'Добавил 50+ собственных слов',
+        isUnlocked: words.length >= 50,
+        category: 'Особые'
+      },
+      { 
+        icon: '⏱️', 
+        title: 'Скоростной', 
+        description: 'Отвечал быстро на 50+ вопросов',
+        isUnlocked: false, // TODO: implement time tracking
+        category: 'Особые'
+      },
+      { 
+        icon: '📊', 
+        title: 'Аналитик', 
+        description: 'Просмотрел профиль 10+ раз',
+        isUnlocked: false, // TODO: implement view tracking
+        category: 'Особые'
+      },
+      { 
+        icon: '🎓', 
+        title: 'Учитель', 
+        description: 'Создал 100+ собственных слов',
+        isUnlocked: words.length >= 100,
+        category: 'Особые'
+      },
+      { 
+        icon: '🌍', 
+        title: 'Путешественник', 
+        description: 'Выучил слова из разных тем',
+        isUnlocked: false, // TODO: implement category tracking
+        category: 'Особые'
+      }
+    ];
+  };
+
   const getAchievements = () => {
-    const achievements = [];
-
-    if (learnedWords.length >= 1) {
-      achievements.push({ icon: '🌟', title: 'Первое слово', description: 'Выучил первое слово' });
-    }
-    if (learnedWords.length >= 10) {
-      achievements.push({ icon: '🏆', title: 'Десятка', description: 'Выучил 10 слов' });
-    }
-    if (learnedWords.length >= 50) {
-      achievements.push({ icon: '🎖️', title: 'Полсотни', description: 'Выучил 50 слов' });
-    }
-    if (learnedWords.length >= 100) {
-      achievements.push({ icon: '🥇', title: 'Сотня', description: 'Выучил 100 слов' });
-    }
-    if (accuracy >= 80 && totalAttempts >= 20) {
-      achievements.push({ icon: '🎯', title: 'Снайпер', description: 'Точность 80%+' });
-    }
-    if (userStats.streakDays >= 7) {
-      achievements.push({ icon: '🔥', title: 'Неделя подряд', description: '7 дней изучения подряд' });
-    }
-    if (userStats.streakDays >= 30) {
-      achievements.push({ icon: '💪', title: 'Месяц подряд', description: '30 дней изучения подряд' });
-    }
-
-    return achievements;
+    return getAllAchievements().filter(achievement => achievement.isUnlocked);
   };
 
   const achievements = getAchievements();
+  const allAchievements = getAllAchievements();
+  const unlockedCount = achievements.length;
+  const totalCount = allAchievements.length;
 
   return (
     <div className="p-6">
@@ -152,32 +325,63 @@ export const UserProfile = ({ words, userStats, saveStats }: UserProfileProps) =
       {/* Achievements */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Icon name="Award" size={24} className="mr-2" />
-            Достижения ({achievements.length})
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Icon name="Award" size={24} className="mr-2" />
+              Достижения ({unlockedCount}/{totalCount})
+            </div>
+            <Badge variant="outline" className="text-sm">
+              {Math.round((unlockedCount / totalCount) * 100)}% разблокировано
+            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {achievements.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-4">🏅</div>
-              <p className="text-gray-500">
-                Пока нет достижений. Начни изучать слова!
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {achievements.map((achievement, index) => (
-                <div key={index} className="flex items-center space-x-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border">
-                  <div className="text-3xl">{achievement.icon}</div>
-                  <div>
-                    <h4 className="font-semibold">{achievement.title}</h4>
-                    <p className="text-sm text-gray-600">{achievement.description}</p>
+          <div className="space-y-6">
+            {/* Achievement Categories */}
+            {['Изучение', 'Точность', 'Серии', 'Особые'].map(category => {
+              const categoryAchievements = allAchievements.filter(a => a.category === category);
+              const unlockedInCategory = categoryAchievements.filter(a => a.isUnlocked).length;
+              
+              return (
+                <div key={category}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-lg">{category}</h4>
+                    <Badge variant="secondary">
+                      {unlockedInCategory}/{categoryAchievements.length}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {categoryAchievements.map((achievement, index) => (
+                      <div 
+                        key={`${category}-${index}`} 
+                        className={`flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                          achievement.isUnlocked 
+                            ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 shadow-sm' 
+                            : 'bg-gray-50 border-gray-200 grayscale opacity-60'
+                        }`}
+                      >
+                        <div className={`text-2xl ${achievement.isUnlocked ? '' : 'filter grayscale'}`}>
+                          {achievement.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h5 className={`font-medium text-sm ${achievement.isUnlocked ? 'text-gray-900' : 'text-gray-500'}`}>
+                            {achievement.title}
+                          </h5>
+                          <p className={`text-xs ${achievement.isUnlocked ? 'text-gray-600' : 'text-gray-400'}`}>
+                            {achievement.description}
+                          </p>
+                        </div>
+                        {achievement.isUnlocked && (
+                          <Icon name="Check" size={16} className="text-green-500" />
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 
